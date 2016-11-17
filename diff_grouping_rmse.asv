@@ -1,0 +1,67 @@
+close all;
+clear all;
+
+dynamics = csvread('centered_temp_per_node.csv');
+time = dynamics(2:end, 1);
+
+L = 25;
+w = 10;
+
+group = [];
+group1 = 1;
+group2 = 1;
+group3 = 1;
+
+for node = 1:47
+    sum_diff = 0;
+    diff = 0;
+    
+    for t = L:L+19
+        load(['simu_', num2str(time(t+w, 1)), '.mat']);
+        centered_temp_of_real_clus = val(clustered_group(node));
+        load(['simu_predict_t_',num2str(time(t, 1)),'_L_',num2str(L*3.6),'_w_',num2str(w*3.6),'.mat']);
+        centered_temp_of_pred_clus = val(clustered_group(node));            
+        sum_diff = sum_diff+abs(centered_temp_of_pred_clus - centered_temp_of_real_clus);
+    end
+    diff = sum_diff/20;
+    
+    if diff<30
+        group(1, group1) = node;
+        group1 = group1  + 1;
+    elseif diff<60
+            group(2, group2) = node;
+            group2 = group2 + 1;
+    else
+        group(3, group3) = node;
+        group3 = group3 + 1;
+    end            
+        
+end
+
+group1 = group1 - 1;
+group2 = group2 - 1;
+group3 = group3 - 1;
+
+
+
+
+
+
+
+
+
+
+rmse_result = [];
+used_time = [];
+column = 1;
+row = 1;
+predict_time = [];
+
+w = [0 10:3:52]
+for tt = 0:15
+    predict_time(1, tt) = 3.6 * w(1, tt);
+end
+
+
+
+

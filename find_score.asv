@@ -1,0 +1,12 @@
+function score = find_score(f, route)
+
+X = zeros(length(f),1);
+node_num = sqrt(length(f));
+
+for i = 1:length(route)-1
+    X((route(i)-1)*node_num+route(i+1),1) = 1;
+end
+
+score = f*X;
+
+end

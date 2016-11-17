@@ -1,0 +1,79 @@
+close all;
+clear all;
+
+dynamics = csvread('centered_temp_per_node.csv');
+time = dynamics(2:end, 1);
+
+L = 25;
+w = 10;
+
+group = [];
+group1 = 1;
+group2 = 1;
+group3 = 1;
+
+for index = 1:47
+    sum_diff = 0;
+    diff = 0;
+    
+    for t = L:L+19
+        load(['simu_', num2str(time(t+n, 1)), '.mat']);
+        centered_temp_of_real_clus = val(clustered_group(index));
+        load(['simu_predict_t_',num2str(time(time_select, 1)),'_L_',num2str(time_to_use*3.6),'_w_',num2str(n*3.6),'.mat']);
+        centered_temp_of_pred_clus = val(clustered_group(index));            
+        sum_diff = sum_diff+abs(centered_temp_of_pred_clus - centered_temp_of_real_clus);
+    end
+    diff = sum_diff/20;
+    
+    if diff<30
+        group(group1,index) = diff;
+        group1 = group1  +1;
+    else if diff<60
+            
+        
+end
+
+
+
+
+
+
+
+
+
+rmse_result = [];
+used_time = [];
+column = 1;
+row = 1;
+
+predict_time = [0 10:3:52];
+
+for L = 25:3:76
+    column = 1;
+    for w = 10:3:52
+        rmse_sum = 0;
+        for time_select = time_to_use:time_to_use+19 %t
+            sum_of_square_error = 0;
+            for index = [18:2:40 1:6 9:16] %
+                load(['simu_', num2str(time(time_select+n, 1)), '.mat']);
+                centered_temp_of_real_clus = val(clustered_group(index));
+                load(['simu_predict_t_', num2str(time(time_select, 1)),'_L_',num2str(time_to_use*3.6),'_w_',num2str(n*3.6),'.mat']);
+                centered_temp_of_pred_clus = val(clustered_group(index));
+                sum_of_square_error = sum_of_square_error + (centered_temp_of_pred_clus - centered_temp_of_real_clus)^2;
+            end
+            root_mean_square_error = sqrt(sum_of_square_error / 26); % 
+            rmse_sum = rmse_sum + root_mean_square_error;
+        end
+        rmse_average = rmse_sum / 20;
+        rmse_result(row, column) = rmse_average;
+        column = column+1;
+        
+    end
+    used_time(row, 1) = time(time_to_use, 1);
+    row = row+1;
+end
+
+rmse_result = [used_time rmse_result];
+rmse_result = [predict_time; rmse_result];
+
+csvwrite('rmse_by_t_L_w_3.csv', rmse_result);

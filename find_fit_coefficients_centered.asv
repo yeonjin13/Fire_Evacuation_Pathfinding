@@ -1,0 +1,27 @@
+
+function coeff = find_fit_coefficients_centered(x, y)
+
+A = [];
+
+[mx nx] = size(x);
+[my ny] = size(y);
+
+if (mx == 1)
+    x = x';
+end
+
+if (my == 1)
+    y = y';
+end
+
+A = [];
+for i=1:length(x)
+    A(i,:) = [A;find_fit_coefficients_centered2(time(time_to_use:time_select, 1), dynamics_
+    %A(i,:) = [log(0.133*x(i)+1) 1]; % y= a*log(0.133*x+1)+b*1
+    %A(i,:) = [log(0.133*x(i)+1)]; % y= a*log(0.133*x+1)+x0
+end
+
+coeff = [coeff;find_fit_coefficients_centered(time(time_to_use:time_select, 1), dynamics_real(time_to_use+1:time_select+1, i+1))'];
+y = [y, coeff(i,1).*log(0.133*time(2:end, 1)+1)+ coeff(i,2)];
+
+coeff = pinv(A)*y;
